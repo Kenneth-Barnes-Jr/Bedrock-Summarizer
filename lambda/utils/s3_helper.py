@@ -1,4 +1,4 @@
-# This is the entry point for the Lambda function
+# This module provides helper functions to interact with AWS S3.
 
 import boto3
 
