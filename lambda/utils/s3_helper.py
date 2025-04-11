@@ -1,27 +1,18 @@
 # This is the entry point for the Lambda function
 
-import json
-from utils.s3_helper import get_s3_object_text, save_summery_to_s3
-from utils.bedrock_client import summarize_text
+import boto3
 
-def lambda_handler(event, context):
+s3 = boto3.client("s3")
 
-bucket = event['Records'][0]['s3']['buucket']['name']
-key = event['Records'][0]['s3']['object']['key']
+def get_s3_object_text(bucket, key):
+    response = s3.get_object(Bucket=bucket, Key=key)
+    return response['Body'].read().decode('utf-8')
 
-print(f"Processing file: s3:///{bucket}/{key}")
-
-# Get document text from S3 bucket
-document_text = get_s3_object_text(bucket, key)
-
-# Get summary from Bedrock
-summary = summarize_text(document_text)
-    
-# Save summary back to S3
-summary_key = key.replace("uploads/", "summaries/").replace(".txt", "_summary.txt")
-save_summary_to_s3(bucket, summary_key, summary)
-    
-return {
-    "statusCode": 200,
-    "body": json.dumps("Summary created and uploaded to S3.")
-}
+def save_summary_to_s3(bucket, key, summary_text):
+    s3.put_object(
+        Bucket=bucket,
+        Key=key,
+        Body=summary_text.encode('utf-8'),
+        ContentType='text/plain'
+    )
+    print(f"Saved summary to s3://{bucket}/{key}")

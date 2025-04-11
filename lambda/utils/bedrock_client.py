@@ -14,7 +14,7 @@ def summarize_text(text):
     })
 
     response = bedrock.invoke_model(
-        modelId="anthropic.claude-3-7-sonnet-20250219-v1:0",  # This is the model of your choice.
+        modelId="anthropic.claude-3-7-sonnet-20250219-v1:0",  # This is the AI/LM model of your choice.
         contentType="application/json",
         accept="application/json",
         body=body
