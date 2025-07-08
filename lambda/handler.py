@@ -1,6 +1,7 @@
 # This is the entry point for the Lambda function
 
 import json
+import urllib.parse
 from utils.s3_helper import get_s3_object_text, get_csv_text_from_s3, save_summary_to_s3
 from utils.bedrock_client import summarize_text
 from utils.textract import extract_text_from_textract
@@ -8,7 +9,8 @@ from utils.textract import extract_text_from_textract
 def lambda_handler(event, context):
     # Parse S3 event info
     bucket = event['Records'][0]['s3']['bucket']['name']
-    key = event['Records'][0]['s3']['object']['key']
+    raw_key = event['Records'][0]['s3']['object']['key'] # This will decode the S3 object key to handle spaces and special characters.
+    key = urllib.parse.unquote_plus(raw_key, encoding='utf-8')
 
     print(f"Processing file: s3://{bucket}/{key}")
 
