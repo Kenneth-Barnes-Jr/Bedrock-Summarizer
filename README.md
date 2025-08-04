@@ -1,7 +1,7 @@
 # Serverless Pipeline for Intelligent Document Summarization on AWS.
 
 ## 🏗️**Techinal Architecture**
-- ![AWS_Ai](<Serverless Pipeline for Intelligent Document Summarization.drawio.png>)
+![AWS_Ai](<Serverless Pipeline for Intelligent Document Summarization.drawio.png>)
 
 1. **Lambda Triggered**
     - This can come from either an S3 event or an API Gateway request.
