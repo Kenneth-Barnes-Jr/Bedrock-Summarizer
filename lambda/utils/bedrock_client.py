@@ -26,3 +26,4 @@ def summarize_text(text):
     except Exception as e:
         print(f"Error calling Bedrock model: {e}")
         return "[Error occurred while generating summary]"
+    

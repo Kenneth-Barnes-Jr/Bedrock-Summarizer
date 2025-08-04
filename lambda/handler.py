@@ -5,16 +5,26 @@ import urllib.parse
 from utils.s3_helper import get_s3_object_text, get_csv_text_from_s3, save_summary_to_s3
 from utils.bedrock_client import summarize_text
 from utils.textract import extract_text_from_textract
+from utils.comprehend_agent import analyze_summarize_documentation
+from utils.dynamodb_helper import summarize_metadata
 
 def lambda_handler(event, context):
-    # Parse S3 event info
+  # Parse S3 event info
     bucket = event['Records'][0]['s3']['bucket']['name']
     raw_key = event['Records'][0]['s3']['object']['key'] # This will decode the S3 object key to handle spaces and special characters.
     key = urllib.parse.unquote_plus(raw_key, encoding='utf-8')
 
     print(f"Processing file: s3://{bucket}/{key}")
 
-    #Decide how to process the document based on its extension.
+  # Prevent infinite loop from triggering on summary files
+    if "summaries/" in key or key.endswith("_summary.txt"):
+        print("File appears to be in summary under the s3 bucket. Skipping to prevent loop.")
+        return {
+            "statusCode": 200,
+            "body": json.dumps("Skipped summary file to avoid loop.")
+    }
+
+  # Process document based on file extension
     if key.lower().endswith(('png', 'jpg', 'jpeg', 'pdf')):
         document_text = extract_text_from_textract(bucket, key)
     elif key.lower().endswith('.csv'):
@@ -22,13 +32,25 @@ def lambda_handler(event, context):
     else:
         document_text = get_s3_object_text(bucket, key)
     
-    # Get summary from Bedrock
+  # Get summary from AWS Bedrock
     summary = summarize_text(document_text)
+
+  # Analyze the summary using AWS Comprehend
+    analysis = analyze_summarize_documentation(summary)
     
-    # Save summary back to S3
+  # Save summary back to S3
     summary_key = key.replace("uploads/", "summaries/").rsplit('.', 1)[0] + "_summary.txt"
     save_summary_to_s3(bucket, summary_key, summary)
-    
+
+    # Save to DynamoDB
+    s3_summary_url = f"s3://{bucket}/{summary_key}"
+    summarize_metadata(
+        original_filename=key,
+        summary=summary,
+        key_points=analysis.get("key_points", []),
+        s3_summary_url=s3_summary_url
+)
+
     return {
         "statusCode": 200,
         "body": json.dumps("Summary created and uploaded to S3.")

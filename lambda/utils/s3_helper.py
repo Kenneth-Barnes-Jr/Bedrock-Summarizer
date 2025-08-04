@@ -40,3 +40,4 @@ def save_summary_to_s3(bucket, key, summary):
         Key=key,
         Body=summary.encode("utf-8")  # Ensure content is in byte format
     )
+    

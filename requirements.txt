@@ -1,0 +1,5 @@
+# Only needed for local testing (not needed if you're packaging for Lambda only)
+boto3
+botocore
+
+# Optional: Add any additional packages if you enhance the pipeline
