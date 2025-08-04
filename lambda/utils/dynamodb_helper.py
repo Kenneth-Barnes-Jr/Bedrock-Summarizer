@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('Documentation_Summaries')
+table = dynamodb.Table('<dynamodb-table>')
 
 def summarize_metadata(original_filename, summary, key_points, s3_summary_url):
     document_id = str(uuid.uuid4())
