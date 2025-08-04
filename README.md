@@ -92,3 +92,5 @@ overhead, and flexibility in how users can interact with the system.
 - Add versioning or history tracking in DynamoDB so users can reprocess or compare older summaries.
 - Create a front-end dashboard (e.g., using React or Streamlit) to upload documents and view summaries directly.
 - Secure the API endpoint with IAM roles, Cognito, or API keys to prevent unauthorized access.
+
+[def]: <Serverless Pipeline for Intelligent Document Summarization.drawio.png>
